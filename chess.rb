@@ -140,35 +140,27 @@ end
 
 class Board
   attr_accessor :grid
+
   def initialize
-    #place pieces here
+    placement = {0 => Rook,
+                 1 => Bishop,
+                 2 => Knight,
+                 3 => Queen,
+                 4 => King,
+                 5 => Knight,
+                 6 => Bishop,
+                 7 => Rook}
     @grid = 8.times.map {8.times.map {Cell.new}}
     #place pawns
     8.times do |col|
       @grid[1][col].piece = Pawn.new(:black, 1, col)
       @grid[6][col].piece = Pawn.new(:white, 6, col)
     end
-    #place rooks
-    [0, 7].each do |col|
-      @grid[0][col].piece = Rook.new(:black, 0, col)
-      @grid[7][col].piece = Rook.new(:white, 7, col)
+    #place other pieces
+    8.times do |col|
+      @grid[0][col].piece = placement[col].new(:black, 0, col)
+      @grid[7][col].piece = placement[col].new(:white, 7, col)
     end
-    #place bishops
-    [1, 6].each do |col|
-      @grid[0][col].piece = Bishop.new(:black, 0, col)
-      @grid[7][col].piece = Bishop.new(:white, 7, col)
-    end
-    #place knights
-    [2, 5].each do |col|
-      @grid[0][col].piece = Knight.new(:black, 0, col)
-      @grid[7][col].piece = Knight.new(:white, 7, col)
-    end
-    #place queens
-    @grid[0][3].piece = Queen.new(:black, 0, 3)
-    @grid[7][3].piece = Queen.new(:white, 7, 3)
-    #place kings
-    @grid[0][4].piece = King.new(:black, 0, 4)
-    @grid[7][4].piece = King.new(:white, 7, 4)
   end
 
   def print_board
