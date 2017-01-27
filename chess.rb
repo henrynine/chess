@@ -3,7 +3,9 @@
 #method of entry:
 #enter piece, show potential squares in green?
 #enter piece and move at same time in shorthand?
-#tricky stuff: en passant, pawn promotion
+#tricky stuff: en passant, pawn promotion, castle
+require 'colorize'
+
 class Piece
   attr_accessor :color, :row, :col
   def initialize(color, row, col)
@@ -11,11 +13,12 @@ class Piece
     @row = row
     @col = col
     @unicode_suffixes = ['', '']
+    @letter = " "
   end
 
-  #gives the unicode symbol for the piece of this color
+  #gives the letter symbol for the piece of this color
   def symbol
-    "265" + @color == :white ? @unicode_suffixes[0] : @unicode_suffixes[1]
+    @color == :white ? @letter.light_white : @letter
   end
 
   #gives all possible row/col changes that are legal moves if not off the board
@@ -50,7 +53,7 @@ class Pawn < Piece
   def initialize(color, row, col)
     super(color, row, col)
     @has_moved = false
-    @unicode_suffixes = ['9', 'F']
+    @letter = "P"
   end
 
   def move_deltas
@@ -74,7 +77,7 @@ end
 class Rook < Piece
   def initialize(color, row, col)
     super(color, row, col)
-    @unicode_suffixes = ['6', 'C']
+    @letter = "R"
   end
 
   def move_deltas
@@ -84,7 +87,7 @@ end
 class Bishop < Piece
   def initialize(color, row, col)
     super(color, row, col)
-    @unicode_suffixes = ['7', 'D']
+    @letter = "B"
   end
 
   def move_deltas
@@ -94,7 +97,7 @@ end
 class Knight < Piece
   def initialize(color, row, col)
     super(color, row, col)
-    @unicode_suffixes = ['8', 'E']
+    @letter = "N"
   end
 
   def move_deltas
@@ -104,7 +107,7 @@ end
 class Queen < Piece
   def initialize(color, row, col)
     super(color, row, col)
-    @unicode_suffixes = ['5', 'B']
+    @letter = "Q"
   end
 
   def move_deltas
@@ -115,15 +118,74 @@ class King < Piece
   #add check stuff
   def initialize(color, row, col)
     super(color, row, col)
-    @unicode_suffixes = ['4', 'A']
+    @letter = "K"
   end
 
   def move_deltas
   end
 end
 
+class Cell
+  attr_accessor :piece
+  def initialize(piece=nil)
+    @piece = piece
+  end
+
+  def print_format
+    return " ".on_white if @piece == nil
+    @piece.symbol.on_white
+  end
+
+end
+
 class Board
   attr_accessor :grid
   def initialize
+    #place pieces here
+    @grid = 8.times.map {8.times.map {Cell.new}}
+    #place pawns
+    8.times do |col|
+      @grid[1][col].piece = Pawn.new(:black, 1, col)
+      @grid[6][col].piece = Pawn.new(:white, 6, col)
+    end
+    #place rooks
+    [0, 7].each do |col|
+      @grid[0][col].piece = Rook.new(:black, 0, col)
+      @grid[7][col].piece = Rook.new(:white, 7, col)
+    end
+    #place bishops
+    [1, 6].each do |col|
+      @grid[0][col].piece = Bishop.new(:black, 0, col)
+      @grid[7][col].piece = Bishop.new(:white, 7, col)
+    end
+    #place knights
+    [2, 5].each do |col|
+      @grid[0][col].piece = Knight.new(:black, 0, col)
+      @grid[7][col].piece = Knight.new(:white, 7, col)
+    end
+    #place queens
+    grid[0][3] = Queen.new(:black, 0, 3)
+    grid[7][3] = King.new(:white, 7, 3)
+    #place kings
+    grid[0][4] = King.new(:black, 0, 4)
+    grid[7][4] = King.new(:white, 7, 4)
+  end
+
+  def print_board
+    put_line
+    @grid.each do |row|
+      print "|".on_white
+      row.each do |cell|
+        print cell.print_format + "|".on_white
+      end
+      put_line
+    end
+    true
+  end
+
+  def put_line
+    puts ""
+    17.times {print "-".on_white}
+    puts ""
   end
 end
