@@ -26,18 +26,19 @@ class Piece
     []
   end
 
+  def legal_moves
+    moves = move_deltas
+    move_deltas.each do |delta_pair|
+      delta_pair.each do |delta|
+        moves.delete(delta_pair) if delta < 0 || delta > 7
+      end
+    end
+    moves
+  end
+
   #checks if a coordinate pair is a legal place to move
   def is_legal_move(row, col)
-    [row, col].each do |n|
-      return false if n > 7 || n < 0
-    end
-    #can be made more efficient: deltas from @r/r, @c/c in deltas?
-    move_deltas.each do |deltas|
-      row_d = deltas[0]
-      col_d = deltas[1]
-      return true if @row+row_d == row && @col+col_d == col
-    end
-    false
+    legal_moves.include?([row, col])
   end
 
   #returns true and moves a piece if it's legal, returns false if illegal
@@ -126,14 +127,19 @@ class King < Piece
 end
 
 class Cell
-  attr_accessor :piece
+  attr_accessor :piece, :selected
   def initialize(piece=nil)
     @piece = piece
+    @selected = false
   end
 
   def print_format
     return " ".on_white if @piece == nil
-    @piece.symbol.on_white
+    if !@selected
+      return @piece.symbol.on_white
+    else
+      return @piece.symbol.on_light_green
+    end
   end
 
 end
@@ -163,6 +169,18 @@ class Board
     end
   end
 
+  def select_cell cell
+    @selected_cell.selected = false unless @selected_cell.nil?
+    @selected_cell = cell
+    @selected_cell.selected = true
+  end
+
+  def put_line
+    puts ""
+    17.times {print "-".on_white}
+    puts ""
+  end
+
   def print_board
     put_line
     @grid.each do |row|
@@ -175,9 +193,5 @@ class Board
     true
   end
 
-  def put_line
-    puts ""
-    17.times {print "-".on_white}
-    puts ""
-  end
+
 end
