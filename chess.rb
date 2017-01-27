@@ -165,9 +165,9 @@ class Board
     end
     #place queens
     @grid[0][3].piece = Queen.new(:black, 0, 3)
-    @grid[7][3].piece = King.new(:white, 7, 3)
+    @grid[7][3].piece = Queen.new(:white, 7, 3)
     #place kings
-    @grid[0][4].piece = Queen.new(:black, 0, 4)
+    @grid[0][4].piece = King.new(:black, 0, 4)
     @grid[7][4].piece = King.new(:white, 7, 4)
   end
 
