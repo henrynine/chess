@@ -164,11 +164,11 @@ class Board
       @grid[7][col].piece = Knight.new(:white, 7, col)
     end
     #place queens
-    grid[0][3] = Queen.new(:black, 0, 3)
-    grid[7][3] = King.new(:white, 7, 3)
+    @grid[0][3].piece = Queen.new(:black, 0, 3)
+    @grid[7][3].piece = King.new(:white, 7, 3)
     #place kings
-    grid[0][4] = King.new(:black, 0, 4)
-    grid[7][4] = King.new(:white, 7, 4)
+    @grid[0][4].piece = Queen.new(:black, 0, 4)
+    @grid[7][4].piece = King.new(:white, 7, 4)
   end
 
   def print_board
