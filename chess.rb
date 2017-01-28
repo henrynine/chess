@@ -27,11 +27,12 @@ class Piece
   end
 
   def legal_moves
-    moves = move_deltas
+    moves = []
     move_deltas.each do |delta_pair|
       delta_pair.each do |delta|
-        moves.delete(delta_pair) if delta < 0 || delta > 7
+        break if delta > 7 || delta < 0
       end
+      moves << [delta_pair[0] + @row, delta_pair[1] + @col]
     end
     moves
   end
@@ -138,8 +139,9 @@ class Cell
     if !@selected
       return @piece.symbol.on_white
     else
-      return @piece.symbol.on_light_green
+      return @piece.symbol.on_cyan
     end
+    "?"
   end
 
 end
@@ -175,6 +177,11 @@ class Board
     @selected_cell.selected = true
   end
 
+  def deselect_cell
+    @selected_cell.selected = false unless @selected_cell.nil?
+    @selected_cell = nil
+  end
+
   def put_line
     puts ""
     17.times {print "-".on_white}
@@ -182,11 +189,20 @@ class Board
   end
 
   def print_board
+    if !@selected_cell.nil?
+      selected_legal_moves = @selected_cell.piece.legal_moves
+    else
+      selected_legal_moves = []
+    end
     put_line
-    @grid.each do |row|
+    @grid.each_with_index do |row, row_index|
       print "|".on_white
-      row.each do |cell|
-        print cell.print_format + "|".on_white
+      row.each_with_index do |cell, col_index|
+        if !(selected_legal_moves.include?([row_index, col_index]))
+          print cell.print_format + "|".on_white
+        else
+          print cell.print_format.on_light_green + "|".on_white
+        end
       end
       put_line
     end
